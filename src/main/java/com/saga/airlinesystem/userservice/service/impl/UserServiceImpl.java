@@ -1,19 +1,26 @@
 package com.saga.airlinesystem.userservice.service.impl;
 
-import com.saga.airlinesystem.userservice.dto.ReservationMessageDto;
 import com.saga.airlinesystem.userservice.dto.UserRequestDto;
 import com.saga.airlinesystem.userservice.dto.UserResponseDto;
 import com.saga.airlinesystem.userservice.exceptions.customexceptions.ResourceNotFoundException;
 import com.saga.airlinesystem.userservice.model.User;
+import com.saga.airlinesystem.userservice.outboxevents.OutboxEventService;
 import com.saga.airlinesystem.userservice.rabbitmq.RabbitProducer;
+import com.saga.airlinesystem.userservice.rabbitmq.messages.UpdateUserMilesRequestMessage;
+import com.saga.airlinesystem.userservice.rabbitmq.messages.UpdateUserMilesResultMessage;
+import com.saga.airlinesystem.userservice.rabbitmq.messages.UserValidationResultMessage;
+import com.saga.airlinesystem.userservice.rabbitmq.messages.ValidateUserRequestMessage;
 import com.saga.airlinesystem.userservice.repository.UserRepository;
 import com.saga.airlinesystem.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static com.saga.airlinesystem.userservice.rabbitmq.RabbitMQConstants.*;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +28,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RabbitProducer reservationEventProducer;
+    private final OutboxEventService outboxEventService;
 
     @Override
     public UserResponseDto createUser(UserRequestDto userRequestDto) {
@@ -48,19 +56,36 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void checkIfUserIsBlacklisted(ReservationMessageDto reservationMessageDto) {
-        Optional<User> user = userRepository.findByEmail(reservationMessageDto.getEmail());
+    public void checkIfUserIsBlacklisted(ValidateUserRequestMessage message) {
+        Optional<User> user = userRepository.findByEmail(message.getEmail());
+        UserValidationResultMessage validationResultMessage = new UserValidationResultMessage(message.getReservationId(), message.getEmail());
         if(user.isEmpty()) {
-            System.out.println("Saljem not found");
-            reservationEventProducer.sendUserNotFound(reservationMessageDto);
+            validationResultMessage.setResolution("User with email " + message.getEmail() + " not found");
+            reservationEventProducer.sendUserValidationFailedEvent(validationResultMessage);
         } else {
             if(user.get().getBlacklisted()) {
-                System.out.println("Saljem blacklisted");
-                reservationEventProducer.sendUserBlackListed(reservationMessageDto);
+                validationResultMessage.setResolution("User with email " + message.getEmail() + " is blacklisted");
+                reservationEventProducer.sendUserValidationFailedEvent(validationResultMessage);
             } else {
-                System.out.println("Saljem ok");
-                reservationEventProducer.sendUserOk(reservationMessageDto);
+                validationResultMessage.setResolution("User validation successful");
+                reservationEventProducer.sendUserValidatedEvent(validationResultMessage);
             }
+        }
+    }
+
+    @Override
+    @Transactional
+    public void updateUserMiles(UpdateUserMilesRequestMessage message) {
+        Optional<User> user = userRepository.findByEmail(message.getEmail());
+        UpdateUserMilesResultMessage updateUserMilesResultMessage = new UpdateUserMilesResultMessage(message.getReservationId());
+        if(user.isEmpty()) {
+            updateUserMilesResultMessage.setResolution("User with email " + message.getEmail() + " not found");
+            outboxEventService.persistOutboxEvent(TICKET_RESERVATION_EXCHANGE, MILES_UPDATE_FAILED_KEY, updateUserMilesResultMessage);
+        } else {
+            // TODO: Lock
+            User userToUpdate = user.get();
+            userToUpdate.addMiles(message.getMiles());
+            outboxEventService.persistOutboxEvent(TICKET_RESERVATION_EXCHANGE, MILES_UPDATED_KEY, updateUserMilesResultMessage);
         }
     }
 

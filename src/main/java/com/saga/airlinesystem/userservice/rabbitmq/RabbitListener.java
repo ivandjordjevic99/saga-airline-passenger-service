@@ -1,6 +1,7 @@
 package com.saga.airlinesystem.userservice.rabbitmq;
 
-import com.saga.airlinesystem.userservice.dto.ReservationMessageDto;
+import com.saga.airlinesystem.userservice.rabbitmq.messages.UpdateUserMilesRequestMessage;
+import com.saga.airlinesystem.userservice.rabbitmq.messages.ValidateUserRequestMessage;
 import com.saga.airlinesystem.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.support.AmqpHeaders;
@@ -8,7 +9,7 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
-import static com.saga.airlinesystem.userservice.rabbitmq.RabbitConfiguration.USER_QUEUE;
+import static com.saga.airlinesystem.userservice.rabbitmq.RabbitMQConstants.*;
 
 @Service
 @RequiredArgsConstructor
@@ -19,24 +20,25 @@ public class RabbitListener {
 
     @org.springframework.amqp.rabbit.annotation.RabbitListener(queues = USER_QUEUE)
     public void handle(String payload, @Header(AmqpHeaders.RECEIVED_ROUTING_KEY) String routingKey) {
-        ReservationMessageDto reservationMessageDto = objectMapper.readValue(payload, ReservationMessageDto.class);
         switch (routingKey) {
-            case "reservation.created":
-                handleReservationCreatedEvent(reservationMessageDto);
+            case USER_VALIDATION_REQUEST_KEY:
+                ValidateUserRequestMessage validateUserRequestMessage = objectMapper.readValue(payload, ValidateUserRequestMessage.class);
+                handleUserValidationRequest(validateUserRequestMessage);
                 break;
-            case "reservation.successful":
-                handleReservationSuccesful(reservationMessageDto);
+            case UPDATE_USER_MILES_REQUEST_KEY:
+                UpdateUserMilesRequestMessage updateUserMilesRequestMessage = objectMapper.readValue(payload, UpdateUserMilesRequestMessage.class);
+                handleUpdateUserMilesRequest(updateUserMilesRequestMessage);
                 break;
             default:
                 System.out.println("Unknown routingKey: " + routingKey);
         }
     }
 
-    private void handleReservationCreatedEvent(ReservationMessageDto reservationMessageDto) {
-        userService.checkIfUserIsBlacklisted(reservationMessageDto);
+    private void handleUserValidationRequest(ValidateUserRequestMessage message) {
+        userService.checkIfUserIsBlacklisted(message);
     }
 
-    private void handleReservationSuccesful(ReservationMessageDto reservationMessageDto) {
-        System.out.println("Reservation successful");
+    private void handleUpdateUserMilesRequest(UpdateUserMilesRequestMessage message) {
+        userService.updateUserMiles(message);
     }
 }
