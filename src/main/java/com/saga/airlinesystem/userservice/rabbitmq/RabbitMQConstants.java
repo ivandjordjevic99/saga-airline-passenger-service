@@ -13,6 +13,4 @@ public class RabbitMQConstants {
     public static final String USER_VALIDATION_FAILED_KEY = "user.validation.failed";
 
     public static final String UPDATE_USER_MILES_REQUEST_KEY = "request.user.update-miles";
-    public static final String MILES_UPDATED_KEY = "user.miles.updated";
-    public static final String MILES_UPDATE_FAILED_KEY = "user.miles.update-failed";
 }
