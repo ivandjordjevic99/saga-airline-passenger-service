@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.saga.airlinesystem</groupId>
-	<artifactId>userservice</artifactId>
+	<artifactId>passengerservice</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>userservice</name>
-	<description>User service for airline system</description>
+	<name>passengerservice</name>
+	<description>Passenger service for airline system</description>
 	<url/>
 	<licenses>
 		<license/>
