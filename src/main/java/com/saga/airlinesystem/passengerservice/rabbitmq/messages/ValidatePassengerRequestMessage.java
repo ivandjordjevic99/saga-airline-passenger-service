@@ -2,16 +2,13 @@ package com.saga.airlinesystem.passengerservice.rabbitmq.messages;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 @Getter
-@Setter
 @ToString(callSuper = true)
 @RequiredArgsConstructor
-public class UserValidationResultMessage extends BaseMessage {
+public class ValidatePassengerRequestMessage extends BaseMessage {
 
-    private final String reservationId;
+    private final String ticketOrderId;
     private final String email;
-    private String resolution;
 }

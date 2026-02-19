@@ -7,10 +7,10 @@ import lombok.Setter;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name = "passengers")
 @Getter
 @Setter
-public class User {
+public class Passenger {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

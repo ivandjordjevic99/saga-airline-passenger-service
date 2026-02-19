@@ -4,5 +4,5 @@ import com.saga.airlinesystem.passengerservice.rabbitmq.messages.BaseMessage;
 
 public interface OutboxEventService {
 
-    void persistOutboxEvent(String exchange, String routingKey, BaseMessage payload);
+    void saveOutboxEvent(String exchange, String routingKey, BaseMessage payload);
 }

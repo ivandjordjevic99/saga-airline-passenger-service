@@ -1,6 +1,6 @@
 package com.saga.airlinesystem.passengerservice.rabbitmq;
 
-import com.saga.airlinesystem.passengerservice.rabbitmq.messages.UserValidationResultMessage;
+import com.saga.airlinesystem.passengerservice.rabbitmq.messages.PassengerValidationResultMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -15,14 +15,14 @@ public class RabbitProducer {
     private final RabbitTemplate rabbitTemplate;
     private final ObjectMapper objectMapper;
 
-    public void sendUserValidatedEvent(UserValidationResultMessage payloadObject) {
+    public void sendPassengerValidatedEvent(PassengerValidationResultMessage payloadObject) {
         String payload = objectMapper.writeValueAsString(payloadObject);
-        sendEvent(TICKET_RESERVATION_EXCHANGE, USER_VALIDATED_KEY, payload);
+        sendEvent(TICKET_BOOKING_EXCHANGE, PASSENGER_VALIDATED_KEY, payload);
     }
 
-    public void sendUserValidationFailedEvent(UserValidationResultMessage payloadObject) {
+    public void sendPassengerValidationFailedEvent(PassengerValidationResultMessage payloadObject) {
         String payload = objectMapper.writeValueAsString(payloadObject);
-        sendEvent(TICKET_RESERVATION_EXCHANGE, USER_VALIDATION_FAILED_KEY, payload);
+        sendEvent(TICKET_BOOKING_EXCHANGE, PASSENGER_VALIDATION_FAILED_KEY, payload);
     }
 
     public void sendEvent(String exchange, String routingKey, String payload) {

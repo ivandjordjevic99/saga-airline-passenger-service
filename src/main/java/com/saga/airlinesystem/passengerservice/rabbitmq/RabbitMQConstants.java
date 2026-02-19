@@ -2,15 +2,17 @@ package com.saga.airlinesystem.passengerservice.rabbitmq;
 
 public class RabbitMQConstants {
 
-    public static final String USER_QUEUE = "user.events";
+    // queue
+    public static final String PASSENGER_QUEUE = "passenger.events";
 
-    public static final String TICKET_RESERVATION_EXCHANGE = "ticket-reservation.exchange";
+    // exchanges
+    public static final String TICKET_BOOKING_EXCHANGE = "ticket-booking.exchange";
 
-    public static final String USER_REQUESTS_TOPIC = "request.user.#";
+    public static final String PASSENGER_REQUESTS_TOPIC = "request.passenger.#";
 
-    public static final String USER_VALIDATION_REQUEST_KEY = "request.user.validation";
-    public static final String USER_VALIDATED_KEY = "user.validation.validated";
-    public static final String USER_VALIDATION_FAILED_KEY = "user.validation.failed";
+    public static final String PASSENGER_VALIDATION_REQUEST_KEY = "request.passenger.validation";
+    public static final String PASSENGER_VALIDATED_KEY = "passenger.validation.validated";
+    public static final String PASSENGER_VALIDATION_FAILED_KEY = "passenger.validation.failed";
 
-    public static final String UPDATE_USER_MILES_REQUEST_KEY = "request.user.update-miles";
+    public static final String UPDATE_PASSENGER_MILES_REQUEST_KEY = "request.passenger.update-miles";
 }

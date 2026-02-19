@@ -13,7 +13,7 @@ public class OutboxEventServiceImpl implements OutboxEventService {
     private final ObjectMapper objectMapper;
 
     @Override
-    public void persistOutboxEvent(String exchange, String routingKey, BaseMessage payload) {
+    public void saveOutboxEvent(String exchange, String routingKey, BaseMessage payload) {
         OutboxEvent outboxEvent = new OutboxEvent(exchange, routingKey, objectMapper.writeValueAsString(payload));
         outboxEventRepository.save(outboxEvent);
     }

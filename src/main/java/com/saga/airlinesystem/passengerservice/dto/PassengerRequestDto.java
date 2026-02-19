@@ -3,12 +3,8 @@ package com.saga.airlinesystem.passengerservice.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import java.util.UUID;
-
 @Data
-public class UserResponseDto {
-
-    private UUID id;
+public class PassengerRequestDto {
 
     @JsonProperty("first_name")
     private String firstName;
@@ -17,6 +13,4 @@ public class UserResponseDto {
     private String lastName;
 
     private String email;
-
-    private Integer miles;
 }
