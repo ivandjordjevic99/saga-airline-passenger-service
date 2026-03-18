@@ -29,10 +29,4 @@ public class Passenger {
     private Boolean blacklisted;
 
     private Integer miles;
-
-    public void addMiles(Integer miles) {
-        System.out.println("Adding miles: " + miles);
-        this.miles += miles;
-        System.out.println("Miles added: " + this.miles);
-    }
 }
